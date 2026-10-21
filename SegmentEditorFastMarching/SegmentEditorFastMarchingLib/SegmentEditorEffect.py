@@ -202,7 +202,15 @@ The effect uses <a href="http://www.spl.harvard.edu/publications/item/view/193">
     caster.SetInputData(sourceImageData)
     self.fm.SetInputConnection(caster.GetOutputPort())
 
-    # self.fm.SetOutput(labelImage)
+    # Nonzero output voxels are excluded from growth.
+    outputImage = self.fm.GetOutput()
+    outputImage.SetExtent(sourceImageData.GetExtent())
+    outputImage.AllocateScalars(vtk.VTK_SHORT, 1)
+    outputImage.GetPointData().GetScalars().Fill(0)
+
+    # Initialize input access and the statistics cache before adding seeds.
+    self.fm.setNPointsEvolution(0)
+    self.fm.Update()
 
     npoints = int(dim[0]*dim[1]*dim[2]*percentMax/100.)
 
